@@ -19,4 +19,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('v1/cart/{id}/change', [CartController::class, 'change']);
+Route::post('v1/cart/change', [CartController::class, 'change']);

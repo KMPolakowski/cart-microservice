@@ -17,19 +17,21 @@ class CartController extends BaseController
     use AuthorizesRequests, ValidatesRequests;
 
     public function __construct(
-        private CartChangeHandlerInterface $cartChangeHandler
-    )
+        private CartChangeHandler $cartChangeHandler
+    ) {}
 
     public function change(
         Request $request,
     ) {
         $this->validate($request, [
-            "changes.item_id" => "bail|required|uuid",
-            "changes.type" => "bail|required|in:" . implode(",", CartChangeType::TYPES),
+            "change" => "bail|required|array",
+            "cart_id" => "bail|required|nullable|uuid",
+            "changes.item_id" => "bail|required|nullable|uuid",
+            "changes.type" => "bail|required|string|in:" . implode(",", CartChangeType::TYPES),
             "changes.amount" => "bail|required|int"
         ]);
 
-        $this->cartChangeHandler->handle();
+        $this->cartChangeHandler->handle($cartId, $request->get);
 
         return;
     }
