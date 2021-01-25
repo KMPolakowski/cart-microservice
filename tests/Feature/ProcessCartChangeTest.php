@@ -3,14 +3,7 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use App\Models\Cart;
 use App\Models\CartChange;
-use Illuminate\Support\Str;
-use App\Models\CartChangeType;
-use App\Jobs\ProcessCartChange;
-use Database\Factories\CartChangeFactory;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ProcessCartChangeTest extends TestCase
@@ -19,43 +12,68 @@ class ProcessCartChangeTest extends TestCase
 
     /**
      * @test
-     * @dataProvider createAddProvider
+     * @dataProvider addProvider
      */
-    public function it_creates_cart_and_adds_item($itemUuid, $amount, $type)
+    public function it_creates_cart_and_adds_changes($itemUuid, $amount, $type)
     {
-
-        $this->post("v1/cart/change",
-        [
-            'changes' => [
-                'item_id' => $itemUuid,
-                'amount' => $amount,
-                'type' => $type
+        $res = $this->json(
+            'POST',
+            'v1/cart/change',
+            [
+                'change' => [
+                    'item_id' => $itemUuid,
+                    'amount' => $amount,
+                    'type' => $type
+                ]
             ]
-        ]);
+        )
+            ->assertCreated()
+            ->assertJsonStructure([
+                'item_uuid',
+                'amount',
+                'cart_change_type_id',
+                'updated_at',
+                'created_at',
+                'cart' => [
+                    'checked_out',
+                    'uuid',
+                    'created_at',
+                    'updated_at'
+                ]
+            ])
+            ->json();
 
-        $cC = CartChange::where('item_uuid', $itemUuid)
-                ->first();
 
-        $this->assertDatabaseCount('carts', 1);
-        $this->assertInstanceOf(CartChange::class, $cC);
-        $this->assertDatabaseHas('carts', ['id' => $cC->cart_id, 'checked_out' => false]);
-        $this->assertDatabaseHas('cart_changes', 
-        [
-            'item_uuid' => $itemUuid,
-            'amount' => $amount,
-            'cart_change_type_id' => $cC->cart_change_type_id
-        ]);
+        $this->assertDatabaseHas('carts', ['uuid' => $res['cart']['uuid'], 'checked_out' => false]);
+        $this->assertDatabaseHas(
+            'cart_changes',
+            [
+                'item_uuid' => $itemUuid,
+                'amount' => $amount,
+                'cart_change_type_id' => $res['cart_change_type_id']
+            ]
+        );
     }
 
     /**
      * @dataProvider
      */
-    public function createAddProvider()
+    public function addProvider()
     {
         return [
             [
                 'itemUuid' => 'd848ef34-5cee-11eb-ae93-0242ac130002',
-                'amount' => 2,
+                'amount' => 5,
+                'type' => 'add'
+            ],
+            [
+                'itemUuid' => 'd848ef34-5cee-11eb-ae93-0242ac130003',
+                'amount' => 2056,
+                'type' => 'add'
+            ],
+            [
+                'itemUuid' => 'd848ef34-5cee-11eb-ae93-0242ac130003',
+                'amount' => 1,
                 'type' => 'add'
             ]
         ];

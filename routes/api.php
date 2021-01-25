@@ -19,4 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('v1/cart/change', [CartController::class, 'change']);
+Route::post('/v1/cart/change', [CartController::class, 'change']);
+Route::get('/v1/cart/{cartId}/changes/remove', [CartController::class, 'getChangesOfTypeRemove']);
+

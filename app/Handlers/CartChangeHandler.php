@@ -1,8 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace App\Handlers\CartChangeHandler;
+namespace App\Handlers;
 
-abstract class CartChangeHandler
+use App\Models\CartChange;
+use App\Models\CartChangeType;
+use App\Library\CartChangeRequest;
+
+abstract class CartChangeHandler implements CartChangeHandlerInterface
 {
     private ?CartChangeHandler $successor = null;
 
@@ -11,16 +15,16 @@ abstract class CartChangeHandler
         $this->successor = $cartChangeHandler;
     }
 
-    final public function handle(String $cartId, array $changes): ?string
+    final public function handle(CartChangeRequest $request): ?CartChange
     {
-        $processed = $this->processing($cartId, $changes);
+        $processed = $this->process($request);
 
         if ($processed === null && $this->successor !== null) {
-            $processed = $this->successor->handle($cartId, $changes);
+            $processed = $this->successor->handle($request);
         }
 
         return $processed;
     }
 
-    abstract protected function processing(String $cartId, array $changes): ?string;
+    public abstract function process(CartChangeRequest $request): ?CartChange;
 }

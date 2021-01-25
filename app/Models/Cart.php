@@ -8,17 +8,25 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Ramsey\Uuid\Rfc4122\UuidV4;
+use Illuminate\Support\Str;
 
 class Cart extends Model
 {
     use HasFactory, Notifiable;
 
+    public function __construct()
+    {
+        $this->uuid = Str::uuid()->toString();
+        parent::__construct();
+    }
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
+        ''
     ];
 
     /**
@@ -39,8 +47,8 @@ class Cart extends Model
         // 'email_verified_at' => 'datetime',
     ];
 
-    public function cartChanges() {
+    public function cartChanges()
+    {
         return $this->hasMany(CartChange::class);
     }
-
 }

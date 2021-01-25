@@ -12,14 +12,14 @@ class CartChangeType extends Model
 {
     use HasFactory, Notifiable;
 
-    const TYPES = ['add', 'change_amount', 'remove', 'checkout', 'revert_checkout'];
+    const TYPES = ['add', 'remove', 'checkout', 'revert_checkout'];
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['type'];
 
     /**
      * The attributes that should be hidden for arrays.

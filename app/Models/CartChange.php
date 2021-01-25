@@ -21,6 +21,7 @@ class CartChange extends Model
      * @var array
      */
     protected $fillable = [
+        'item_uuid'
     ];
 
     /**
@@ -29,7 +30,7 @@ class CartChange extends Model
      * @var array
      */
     protected $hidden = [
-        'id'
+        'id', 'cart_id'
     ];
 
     /**

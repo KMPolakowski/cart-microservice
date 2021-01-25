@@ -1,6 +1,12 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace App\Handlers\CartChangeHandler;
+declare(strict_types=1);
+
+namespace App\Handlers;
+
+use App\Models\CartChange;
+use App\Library\CartChangeRequest;
+use App\Handlers\CartChangeHandler;
 
 class RemoveHandler extends CartChangeHandler
 {
@@ -11,8 +17,21 @@ class RemoveHandler extends CartChangeHandler
         $this->successor = $cartChangeHandler;
     }
 
-    protected function processing(String $cartId, array $changes): ?string
+    public function process(CartChangeRequest $request): ?CartChange
     {
+        if ($request->getCartChangeType()->type !== 'remove') {
+            return null;
+        }
+
+        $cartChange = new CartChange();
         
+        $cartChange->item_uuid = $request->getItemId();
+        $cartChange->amount = $request->getAmount();
+        $cartChange->cart_change_type_id = $request->getCartChangeType()->id;
+    
+        
+        $request->getCart()->cartChanges()->save($cartChange);
+
+        return $cartChange;
     }
 }
