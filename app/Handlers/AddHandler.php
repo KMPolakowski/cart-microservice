@@ -11,7 +11,7 @@ use App\Handlers\CartChangeHandler;
 
 class AddHandler extends CartChangeHandler
 {
-    private ?CartChangeHandler $successor = null;
+    protected ?CartChangeHandler $successor = null;
 
     public function __construct(CartChangeHandler $cartChangeHandler = null)
     {
@@ -36,7 +36,7 @@ class AddHandler extends CartChangeHandler
         $cartChange->amount = $request->getAmount();
         $cartChange->cart_change_type_id = $request->getCartChangeType()->id;
     
-        $cart->save();
+        $cart->saveOrFail();
         $cart->cartChanges()->save($cartChange);
 
         return $cartChange;

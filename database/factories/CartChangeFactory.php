@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\Cart;
 use App\Models\CartChange;
 use App\Models\CartChangeType;
-use GuzzleHttp\Promise\Create;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CartChangeFactory extends Factory

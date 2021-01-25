@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use App\Handlers\CartChangeHandlerInterface;
 use App\Models\CartChange;
+use App\Services\CartStateResolver;
 
 class CartController extends BaseController
 {
@@ -21,18 +22,17 @@ class CartController extends BaseController
         CartChangeHandlerInterface $cartChangeHandler
     ) {
         $this->validate($request, [
-            "change" => "bail|required|array",
             "cart_id" => "bail|uuid",
-            "change.item_id" => "bail|required|uuid",
-            "change.type" => "bail|required|string|in:" . implode(",", CartChangeType::TYPES),
-            "change.amount" => "bail|required|int"
+            "item_id" => "bail|required|uuid",
+            "type" => "bail|required|string|in:" . implode(",", CartChangeType::TYPES),
+            "amount" => "bail|required|int"
         ]);
-
+                
         $cC = $cartChangeHandler->handle(
             new CartChangeRequest(
-                CartChangeType::where('type', $request->input('change.type'))->firstOrFail(),
-                $request->input('change.amount'),
-                $request->input('change.item_id'),
+                CartChangeType::where('type', $request->input('type'))->firstOrFail(),
+                $request->input('amount'),
+                $request->input('item_id'),
                 Cart::where('uuid', $request->input('cart_id'))->first()
             )
         );
@@ -47,13 +47,19 @@ class CartController extends BaseController
         $request['cart_id'] = $cartId;
 
         $this->validate($request, [
-            "cart_id" => "bail|required|uuid",
+            "cart_id" => "required|uuid",
         ]);
 
-        $changes = CartChange::where('cart_id', $cartId)
-            ->andWhere('type', 'remove')
-            ->all();
+        $cart = Cart::where('uuid', $cartId)->firstOrFail();
+        $cartChangeType = CartChangeType::where('type', 'remove')->firstOrFail();
 
+        $changes = CartChange::where('cart_change_type_id', $cartChangeType->id)
+            ->where('cart_id', $cart->id)
+            ->with('cartChangeType')
+            ->get();
         return $changes;
     }
+
+    // TODO: endpoint for resolving cart state with \App\Services\CartStateResolver
+
 }

@@ -11,7 +11,7 @@ use App\Handlers\CartChangeHandler;
 
 class CheckoutHandler extends CartChangeHandler
 {
-    private ?CartChangeHandler $successor = null;
+    protected ?CartChangeHandler $successor = null;
 
     public function __construct(CartChangeHandler $cartChangeHandler = null)
     {
@@ -20,20 +20,21 @@ class CheckoutHandler extends CartChangeHandler
 
     public function process(CartChangeRequest $request): ?CartChange
     {
-        if (!\in_array($request->getCartChangeType()->type, ['check_out', 'revert_checkout'])) {
+        if (!\in_array($request->getCartChangeType()->type, ['checkout', 'revert_checkout'])) {
             return null;
         }
 
         $cartChange = new CartChange();
-        
+
         $cartChange->item_uuid = $request->getItemId();
         $cartChange->amount = 1;
         $cartChange->cart_change_type_id = $request->getCartChangeType()->id;
-    
+
 
         $cart = $request->getCart();
-        $cart->checked_out = true;
+        $cart->checked_out = $request->getCartChangeType()->type === 'checkout';
 
+        $cart->saveOrFail();
         $cart->cartChanges()->save($cartChange);
 
         \event(new CheckoutEvent($cartChange));

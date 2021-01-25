@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Cart;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class CartFactory extends Factory
 {
@@ -22,7 +23,7 @@ class CartFactory extends Factory
     public function definition()
     {
         return [
-            'uuid' => $this->faker->uuid,
+            'uuid' => Str::uuid()->toString(),
             'checked_out' => $this->faker->boolean()
         ];
     }

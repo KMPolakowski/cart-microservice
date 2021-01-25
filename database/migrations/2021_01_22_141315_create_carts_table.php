@@ -18,7 +18,7 @@ class CreateCartsTable extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->boolean('checked_out')->nullable()->default(false);
-            $table->binary('uuid');
+            $table->char('uuid');
             $table->timestamps();
         });
     }

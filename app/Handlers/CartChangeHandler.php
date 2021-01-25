@@ -8,7 +8,7 @@ use App\Library\CartChangeRequest;
 
 abstract class CartChangeHandler implements CartChangeHandlerInterface
 {
-    private ?CartChangeHandler $successor = null;
+    protected ?CartChangeHandler $successor = null;
 
     public function __construct(CartChangeHandler $cartChangeHandler = null)
     {

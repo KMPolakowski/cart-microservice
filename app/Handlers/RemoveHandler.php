@@ -10,7 +10,7 @@ use App\Handlers\CartChangeHandler;
 
 class RemoveHandler extends CartChangeHandler
 {
-    private ?CartChangeHandler $successor = null;
+    protected ?CartChangeHandler $successor = null;
 
     public function __construct(CartChangeHandler $cartChangeHandler = null)
     {

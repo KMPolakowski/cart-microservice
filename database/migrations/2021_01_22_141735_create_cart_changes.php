@@ -16,7 +16,7 @@ class CreateCartChanges extends Migration
         Schema::create('cart_changes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('cart_id');
-            $table->binary('item_uuid');
+            $table->char('item_uuid');
             $table->foreignId('cart_change_type_id');
             $table->integer('amount');
             $table->timestamps();
